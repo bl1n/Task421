@@ -6,14 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <team.lf.task421.CustomView
+        android:id="@+id/customView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:total="10"
-        app:count="3"
+        app:colorBackground="@color/colorPrimary"
+        app:colorMain="@color/colorAccent"
+        app:colorSecondary="@color/colorPrimaryDark"
+        app:count="6"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.33"
+        app:total="10" />
+
+    <team.lf.task421.CustomView
+        android:id="@+id/customView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="@id/customView"
+        app:count="5"
+        app:total="20"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

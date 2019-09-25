@@ -3,5 +3,8 @@
     <declare-styleable name="CustomView">
         <attr name="count" format="integer"/>
         <attr name="total" format="integer"/>
+        <attr name="colorMain" format="reference"/>
+        <attr name="colorSecondary" format="reference"/>
+        <attr name="colorBackground" format="reference"/>
     </declare-styleable>
 </resources>

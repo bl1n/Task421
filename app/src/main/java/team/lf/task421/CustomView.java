@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -29,8 +31,11 @@ public class CustomView extends View {
     private float mValueSum = 0;
     private float mStrokeSize = 0.1f;
     private Paint mInnerCirclePaint;
+    private RectF mInnerOval;
 
-
+    private int mColorMain;
+    private int mColorSecondary;
+    private int mColorBackground;
 
 
     public CustomView(Context context) {
@@ -44,9 +49,16 @@ public class CustomView extends View {
 
     private void init(Context context, AttributeSet attrs) {
 
+        TypedArray mainTypedArray = context.getTheme()
+                .obtainStyledAttributes(attrs, R.styleable.CustomView, 0, 0);
+        mColorMain = mainTypedArray.getColor(R.styleable.CustomView_colorMain, getResources().getColor(R.color.chartBlue));
+        mColorSecondary = mainTypedArray.getColor(R.styleable.CustomView_colorSecondary, getResources().getColor(R.color.chartGrey));
+        mColorBackground = mainTypedArray.getColor(R.styleable.CustomView_colorBackground, getResources().getColor(R.color.chartRisk));
+
+
 
         mMainTextPaint = new Paint();
-        mMainTextPaint.setColor(getResources().getColor(R.color.chartBlue));
+        mMainTextPaint.setColor(mColorMain);
         mMainTextPaint.setStyle(Paint.Style.STROKE);
         mMainTextPaint.setTextSize(getResources().getDimensionPixelSize(R.dimen.large_text));
         mMainTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -54,15 +66,13 @@ public class CustomView extends View {
 
 
         mInnerCirclePaint = new Paint();
-        mInnerCirclePaint.setColor(context.getResources().getColor(R.color.chartRisk));
+        mInnerCirclePaint.setColor(mColorBackground);
         mInnerCirclePaint.setStyle(Paint.Style.FILL);
         mInnerCirclePaint.setAntiAlias(true);
 
         //attrs
-        TypedArray typedArray = context.getTheme()
-                .obtainStyledAttributes(attrs, R.styleable.CustomView, 0, 0);
-        mCountOfBlue =typedArray.getInt(R.styleable.CustomView_count, 0);
-        mTotalSectors =typedArray.getInt(R.styleable.CustomView_total, 0);
+        mCountOfBlue =mainTypedArray.getInt(R.styleable.CustomView_count, 0);
+        mTotalSectors =mainTypedArray.getInt(R.styleable.CustomView_total, 0);
 
         mSectors = sectorFactory(mCountOfBlue, mTotalSectors, mStrokeSize);
 
@@ -77,31 +87,45 @@ public class CustomView extends View {
 
         mStandartBounds = new RectF();
         mTotalBounds = new RectF();
+        mInnerOval = new RectF();
+
 
 
     }
 
-    public List<Sector> sectorFactory(int count, int total, float strokeSize){
+    private List<Sector> sectorFactory(int count, int total, float strokeSize){
         List<Sector> sectors = new ArrayList<>(total);
         if(count == total || count> total) {
-            sectors.add(new Sector(1f, getResources().getColor(R.color.chartBlue)));
+            sectors.add(new Sector(1f, mColorMain));
             return sectors;
         } else if(count == 0) {
-            sectors.add(new Sector(1f, getResources().getColor(R.color.chartGrey)));
+            sectors.add(new Sector(1f, mColorSecondary));
             return sectors;
         } else  {
             for(int i = 0; i<count; i++){
-                sectors.add(new Sector(1f, getResources().getColor(R.color.chartBlue)));
-                sectors.add(new Sector(strokeSize, getResources().getColor(R.color.chartRisk)));
+                sectors.add(new Sector(1f, mColorMain));
+                sectors.add(new Sector(strokeSize, mColorBackground));
             }
             for(int i = 0; i<(total-count); i++){
-                sectors.add(new Sector(1f, getResources().getColor(R.color.chartGrey)));
-                sectors.add(new Sector(strokeSize, getResources().getColor(R.color.chartRisk)));
+                sectors.add(new Sector(1f, mColorSecondary));
+                sectors.add(new Sector(strokeSize, mColorBackground));
             }
             return sectors;
         }
 
     }
+
+    public void addCount(){
+        if(mCountOfBlue < mTotalSectors){
+            mCountOfBlue++;
+        } else{
+            mCountOfBlue = 0;
+        }
+        mSectors = sectorFactory(mCountOfBlue, mTotalSectors, mStrokeSize);
+
+        invalidate();
+    }
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -115,6 +139,8 @@ public class CustomView extends View {
         mTotalBounds.set(0, 0, measuredWidth, measuredHeight);
         mStandartBounds.set(mTotalBounds);
         mStandartBounds.inset(measuredWidth * 0.22f, measuredHeight * 0.22f);
+        mInnerOval.set(mTotalBounds);
+        mInnerOval.inset(measuredWidth * 0.25f, measuredHeight * 0.25f);
         setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
@@ -129,11 +155,16 @@ public class CustomView extends View {
             startAngle = s.draw(canvas, mStandartBounds, startAngle);
         }
 
-        canvas.drawCircle(cx, cy, mInnerRadius, mInnerCirclePaint);
+        canvas.drawOval(mInnerOval,mInnerCirclePaint);
         canvas.drawText(String.valueOf(mCountOfBlue),cx, cy+mMainTextPaint.getTextSize()/3,mMainTextPaint );
-
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+//        addCount();
+        return super.onTouchEvent(event);
+    }
 
     private static class Sector {
         private float mValue;
