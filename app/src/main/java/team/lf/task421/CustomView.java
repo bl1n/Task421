@@ -133,7 +133,7 @@ public class CustomView extends View {
         mInnerRadius = mMainTextPaint.measureText("10");
         mSectorRadius = mInnerRadius * 1.1f;
         mTotalRadius = mInnerRadius * 1.2f;
-        int desiredDiameter = (int) (mInnerRadius * 4f);
+        int desiredDiameter = (int) (mInnerRadius * 3f);
         int measuredWidth = resolveSize(desiredDiameter, widthMeasureSpec);
         int measuredHeight = resolveSize(desiredDiameter, heightMeasureSpec);
         mTotalBounds.set(0, 0, measuredWidth, measuredHeight);
